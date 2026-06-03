@@ -5,7 +5,7 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
  
-  const apiKey = 'sk-ant-api03--aOk_1iSLrY4MwqDB4AMTvArrwo0_yz1rgGhIFbWS8nwDG864qtybuhcC-nT044E3VsGxxnzgCNKu2wERE1m0Q-_cQEzwAA';
+  const apiKey = process.env.ANTHROPIC_API_KEY;
   
  
   try {
