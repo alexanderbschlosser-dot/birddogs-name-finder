@@ -6,11 +6,19 @@
   <title>birddogs name finder</title>
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f7f6f3;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f7f6f3;min-height:100vh;padding:24px}
     h1{font-size:22px;font-weight:600;color:#111;text-align:center;margin-bottom:4px}
     .sub{font-size:13px;color:#999;text-align:center;margin-bottom:24px}
-    .card{width:100%;max-width:580px;background:#fff;border-radius:16px;border:1px solid #e8e8e4;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,0.06)}
-    .msgs{height:420px;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:10px}
+    .wrap{max-width:700px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+
+    /* TABS */
+    .tabs{display:flex;gap:8px;justify-content:center}
+    .tab{padding:9px 22px;border-radius:24px;border:1px solid #e0e0dc;background:#fff;font-size:14px;font-weight:500;color:#555;cursor:pointer;transition:all 0.15s}
+    .tab.active{background:#111;color:#fff;border-color:#111}
+
+    /* AI CHAT */
+    .card{background:#fff;border-radius:16px;border:1px solid #e8e8e4;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,0.06)}
+    .msgs{height:380px;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:10px}
     .msg{max-width:85%;padding:11px 15px;border-radius:14px;font-size:14px;line-height:1.6}
     .user{align-self:flex-end;background:#111;color:#fff;border-bottom-right-radius:3px}
     .bot{align-self:flex-start;background:#f5f5f2;color:#111;border:1px solid #eee;border-bottom-left-radius:3px}
@@ -24,36 +32,187 @@
     .row input:focus{border-color:#111}
     .row button{padding:10px 20px;background:#111;color:#fff;border:none;border-radius:24px;font-size:14px;font-weight:500;cursor:pointer}
     .row button:disabled{opacity:0.35;cursor:not-allowed}
-    footer{margin-top:14px;font-size:11px;color:#ccc;text-align:center}
+
+    /* BROWSE */
+    .browse{display:flex;flex-direction:column;gap:12px}
+    .cat-tabs{display:flex;gap:8px;flex-wrap:wrap}
+    .cat-tab{padding:8px 18px;border-radius:24px;border:1px solid #e0e0dc;background:#fff;font-size:13px;font-weight:500;color:#555;cursor:pointer;transition:all 0.15s}
+    .cat-tab.active{background:#111;color:#fff;border-color:#111}
+    .sub-tabs{display:flex;gap:6px;flex-wrap:wrap}
+    .sub-tab{padding:6px 14px;border-radius:20px;border:1px solid #e0e0dc;background:#fafaf8;font-size:12px;color:#555;cursor:pointer;transition:all 0.15s}
+    .sub-tab.active{background:#333;color:#fff;border-color:#333}
+    .product-grid{display:flex;flex-direction:column;gap:6px;max-height:460px;overflow-y:auto}
+    .product-row{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#fff;border:1px solid #eee;border-radius:10px;gap:12px}
+    .product-row:hover{border-color:#ccc;background:#fafaf8}
+    .p-new{font-size:14px;font-weight:500;color:#111;flex:1}
+    .p-old{font-size:12px;color:#aaa;text-align:right;flex:1}
+    .p-type{font-size:11px;color:#bbb;background:#f5f5f2;border-radius:6px;padding:2px 7px;white-space:nowrap}
+    .section-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:#aaa;padding:4px 0}
+    .empty{color:#aaa;font-size:14px;text-align:center;padding:24px}
+
+    footer{margin-top:20px;font-size:11px;color:#ccc;text-align:center}
+
+    .hidden{display:none!important}
   </style>
 </head>
 <body>
-<h1>🐦 birddogs name finder</h1>
-<p class="sub">search old & new product names instantly</p>
-<div class="card">
-  <div class="msgs" id="msgs">
-    <div class="msg bot">Hey! 👋 I know every birddogs product — old names and new. Try asking:<br><br>
-    • <em>what are black pants called now?</em><br>
-    • <em>what are supersoft tees called now?</em><br>
-    • <em>what is The Nightcaps?</em><br>
-    • <em>show me all swim shorts</em><br>
-    • <em>navy polo</em></div>
+<div class="wrap">
+  <h1>🐦 birddogs name finder</h1>
+  <p class="sub">find old & new product names instantly</p>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('ai')">💬 Ask AI</button>
+    <button class="tab" onclick="switchTab('browse')">📋 Browse by Category</button>
   </div>
-  <div class="chips">
-    <span class="chip" onclick="ask('what are black pants called now')">black pants</span>
-    <span class="chip" onclick="ask('what are supersoft tees called now')">supersoft tees</span>
-    <span class="chip" onclick="ask('show me all swim shorts')">swim shorts</span>
-    <span class="chip" onclick="ask('navy gym shorts')">navy gym shorts</span>
-    <span class="chip" onclick="ask('show me all polos')">all polos</span>
-    <span class="chip" onclick="ask('gray quarter zip')">gray quarter zip</span>
+
+  <!-- AI CHAT -->
+  <div id="aiTab" class="card">
+    <div class="msgs" id="msgs">
+      <div class="msg bot">Hey! 👋 I know every birddogs product — old names and new. Try asking:<br><br>
+      • <em>what are black pants called now?</em><br>
+      • <em>what are supersoft tees called now?</em><br>
+      • <em>what is The Nightcaps?</em><br>
+      • <em>show me all swim shorts</em><br>
+      • <em>navy polo</em></div>
+    </div>
+    <div class="chips">
+      <span class="chip" onclick="ask('what are black pants called now')">black pants</span>
+      <span class="chip" onclick="ask('what are supersoft tees called now')">supersoft tees</span>
+      <span class="chip" onclick="ask('show me all swim shorts')">swim shorts</span>
+      <span class="chip" onclick="ask('navy gym shorts')">navy gym shorts</span>
+      <span class="chip" onclick="ask('show me all polos')">all polos</span>
+      <span class="chip" onclick="ask('gray quarter zip')">gray quarter zip</span>
+    </div>
+    <div class="row">
+      <input id="inp" type="text" placeholder="type a name, color, or product..."/>
+      <button id="btn" onclick="send()">Ask</button>
+    </div>
   </div>
-  <div class="row">
-    <input id="inp" type="text" placeholder="type a name, color, or product..."/>
-    <button id="btn" onclick="send()">Ask</button>
+
+  <!-- BROWSE -->
+  <div id="browseTab" class="browse hidden">
+    <div class="cat-tabs">
+      <button class="cat-tab active" onclick="setCat('bottoms')">👖 Bottoms</button>
+      <button class="cat-tab" onclick="setCat('tops')">👕 Tops</button>
+    </div>
+    <div class="sub-tabs" id="subTabs"></div>
+    <div class="product-grid" id="productGrid"></div>
   </div>
 </div>
 <footer>powered by birddogs & claude ai</footer>
+
 <script>
+// ─── DATA ───────────────────────────────────────────────
+const DATA = {
+  bottoms: {
+    "3-in-1 Khaki Shorts": [
+      {old:"—",new:"The No Metric System"},{old:"—",new:"The Catalina Wind Mixer"},{old:"—",new:"The Roppongi Rockstars"},{old:"—",new:"Osmunda the Great"},{old:"—",new:"Tight Lotus"},{old:"—",new:"The Capital Bloomers"},{old:"—",new:"The Stephen's Talkhouse"},{old:"—",new:"Summer in a Shorts Bottle"},
+      {old:"Khaki Shorts - Baby Blue",new:"The Chapel Thrills"},{old:"Khaki Shorts - Beach Glass",new:"The Island Apertifs"},{old:"Khaki Shorts - Bermuda Blue",new:"The Ray Finkles"},{old:"Khaki Shorts - Black",new:"The Nightcaps"},{old:"Khaki Shorts - Cranberry",new:"The Redlines"},{old:"Khaki Shorts - Dark Gray",new:"The Free Plays"},{old:"Khaki Shorts - Dark Green",new:"The Frank the Tanks"},{old:"Khaki Shorts - Graham",new:"The Marty McFridays"},{old:"Khaki Shorts - Kashmir Green",new:"The Green Room"},{old:"Khaki Shorts - Lavender",new:"The Lavender Lords"},{old:"Khaki Shorts - Light Gray",new:"The Second Winds"},{old:"Khaki Shorts - Lobster Red",new:"The Coral Horizons"},{old:"Khaki Shorts - Maroon",new:"The Burgundy Hours"},{old:"Khaki Shorts - Navy",new:"The Sidequest"},{old:"Khaki Shorts - Nile Blue",new:"The Splashton Kutchers"},{old:"Khaki Shorts - Original Khaki",new:"The Sunrise Crew"},{old:"Khaki Shorts - Peach",new:"Life's A Peach"},{old:"Khaki Shorts - Purple Rose",new:"The Grape Gatsby"},{old:"Khaki Shorts - Riverside",new:"The Burton Boys"},{old:"Khaki Shorts - Stone",new:"The Irish Exits"},{old:"Khaki Shorts - Storm Blue",new:"The Andy Duffrains"},{old:"Khaki Shorts - Sunlight Yellow",new:"The Punch-a-Chus"},{old:"Khaki Shorts - Surfspray",new:"The Seafoam Seekers"},{old:"Khaki Shorts - White",new:"The Old Sports"}
+    ],
+    "ElasTech Gym Shorts": [
+      {old:"Gym Shorts 2.0 - Black",new:"The Knightriders"},{old:"Gym Shorts 2.0 - Black Heather",new:"The Shortal Kombats"},{old:"Gym Shorts 2.0 - Gray",new:"The Gray Area 51s"},{old:"Gym Shorts 2.0 - Gray Heather",new:"The Kung Pow-ers"},{old:"Gym Shorts 2.0 - Navy",new:"The BraveShorts"},{old:"Gym Shorts 2.0 - Navy Heather",new:"The Tae Kwon-Don'ts"}
+    ],
+    "Gym Shorts": [
+      {old:"Gym Shorts - Black",new:"Duffy The Vampire Slayers"},{old:"Gym Shorts - Black Heather",new:"Lunchman Larrys"},{old:"Gym Shorts - Blue & Pink Floral",new:"The Captain South Americas"},{old:"Gym Shorts - Gray & Dark Gray",new:"The Tightwads"},{old:"Gym Shorts - Gray Camo",new:"The Zero Dark 30's"},{old:"Gym Shorts - Gray Heather",new:"Coach Cockburns"},{old:"Gym Shorts - Green Camo",new:"The Deerhunters"},{old:"Gym Shorts - Navy & White",new:"The Billy Budds"},{old:"Gym Shorts - Navy Heather",new:"Art Fartknockers"},{old:"Gym Shorts - Purple & Pink",new:"The Baysiders"},{old:"Gym Shorts - Red",new:"The Red Zones"},{old:"Gym Shorts - Red Seersucker",new:"The S.S. TD's"},{old:"Gym Shorts - Royal Blue",new:"The Blue Bloods"},{old:"Gym Shorts - White",new:"The Club Whites"}
+    ],
+    "Lounge Shorts": [
+      {old:"Lounge Shorts - Charcoal Heather",new:"The Buenos Noches"},{old:"Lounge Shorts - Oatmeal Heather",new:"The Double Siestas"},{old:"Lounge Shorts - Stonewash Heather",new:"The Machu Pichus"}
+    ],
+    "Tech Linen Shorts": [
+      {old:"Tech Linen Shorts - Beige",new:"The Amalfi Operators"},{old:"Tech Linen Shorts - Navy",new:"The Summer Weights"},{old:"Tech Linen Shorts - White",new:"The John Linens"}
+    ],
+    "Fancy Khaki Shorts": [
+      {old:"Club Shorts - Black",new:"The Bethpage Slacks"},{old:"Club Shorts - Carolina Blue",new:"The Pine Thirsts"},{old:"Club Shorts - Dark Gray",new:"The Torrey Reclines"},{old:"Club Shorts - Khaki",new:"The Soakmonts"},{old:"Club Shorts - Navy",new:"The Shinnecock Chills"},{old:"Club Shorts - Sedona Fade",new:"The Bandon Dudes"}
+    ],
+    "Canvas Easy Shorts": [
+      {old:"—",new:"The Morning Debriefs"},{old:"—",new:"The Ditch Plains"},{old:"—",new:"The Navajo Trails"},{old:"—",new:"The Top Bunks"},
+      {old:"Easy Shorts - Beige",new:"The Indian Wells"},{old:"Easy Shorts - Khaki",new:"The Genghis Khakis"},{old:"Easy Shorts - Monument Gray",new:"The Long Walk Home"},{old:"Easy Shorts - Navy",new:"The 4:06 Cannonball"},{old:"Easy Shorts - Navy",new:"Maximus Decimus Materialus"}
+    ],
+    "Pants": [
+      {old:"Stretch Khakis - Black",new:"The Shadow Forms"},{old:"Stretch Khakis - Dark Gray",new:"The Dark Matters"},{old:"Stretch Khakis - Gray",new:"The Singularities"},{old:"Stretch Khakis - Khaki",new:"The Incognitos"},{old:"Stretch Khakis - Light Gray",new:"The Neil Leg-Strongs"},{old:"Stretch Khakis - Dark Charcoal",new:"The Leviathan Prime"},{old:"Stretch Khakis - Navy",new:"The Laminar Flows"},{old:"Stretch Khakis - Hunter Green",new:"The Fee Farmers"},{old:"Stretch Khakis - Steel Blue",new:"The Buzz All-Grins"},{old:"Stretch Khakis - Stone",new:"The Silent Strikes"}
+    ],
+    "Flex 5-Pocket Pants": [
+      {old:"5-Pocket Tech Pants - Black",new:"Buzzed Gravity"},{old:"5-Pocket Tech Pants - Black",new:"The Shadow Forms"},{old:"5-Pocket Tech Pants - Black",new:"The Empire Sits Back"},{old:"5-Pocket Tech Pants - Dark Gray",new:"The Thunder Runs"},{old:"5-Pocket Tech Pants - Graphite",new:"The Dark Matters"},{old:"5-Pocket Tech Pants - Gray",new:"The AeroWeapons"},{old:"5-Pocket Tech Pants - Gray",new:"The Singularities"},{old:"5-Pocket Tech Pants - Khaki",new:"The Theta Waves"},{old:"5-Pocket Tech Pants - Mocha Gray",new:"The Slipstreams"},{old:"5-Pocket Tech Pants - Navy",new:"The Apollowned"},{old:"5-Pocket Tech Pants - Navy",new:"The Laminar Flows"},{old:"5-Pocket Tech Pants - Navy",new:"The Big Lebreathski"},{old:"5-Pocket Tech Pants - Olive",new:"The Gamma Bursts"},{old:"5-Pocket Tech Pants - Sand",new:"The Incognitos"},{old:"5-Pocket Tech Pants - Sand",new:"Houston, We're Comfortable"},{old:"5-Pocket Tech Pants - Stone",new:"The Drift Vectors"},{old:"5-Pocket Tech Pants - Stone",new:"The Silent Strikes"}
+    ],
+    "Joggers": [
+      {old:"Performance Jogger - Black",new:"The Empire Sits Back"},{old:"Performance Jogger - Khaki",new:"Houston, We're Comfortable"},{old:"Performance Jogger - Navy",new:"The Chillenium Falcons"}
+    ],
+    "Bathing Suits / Swim Shorts": [
+      {old:"Swim Shorts - Blue & Red Flower",new:"Yachtstock '77"},{old:"Swim Shorts - Blue & White",new:"The Gentle Gaffers"},{old:"Swim Shorts - Blue & White Stripe",new:"The Homer Swimpsons"},{old:"Swim Shorts - Coral",new:"The Soak Hogans"},{old:"Swim Shorts - Delphi Blue",new:"The Aegean Ease"},{old:"Swim Shorts - Delphi Green",new:"The Ibiza Ease"},{old:"Swim Shorts - La Prade's Blue",new:"James Earl Buoys"},{old:"Swim Shorts - Living Coral",new:"The Good Will Holdings"},{old:"Swim Shorts - Navy",new:"The Ted Splashos"},{old:"Swim Shorts - Orange",new:"Mango Unchained"},{old:"Swim Shorts - Pink",new:"The James Ponds"},{old:"Swim Shorts - Pink & White",new:"The Bart Swimpsons"},{old:"Swim Shorts - Sea Green",new:"The Keanu Reefs"},{old:"Swim Shorts - Turquoise Flower",new:"Nantucket Nector '76"}
+    ]
+  },
+  tops: {
+    "Polo": [
+      {old:"—",new:"The Second Wind"},{old:"—",new:"The Last Call"},{old:"—",new:"The Cold Open"},{old:"—",new:"The Extra Inning"},
+      {old:"Performance Polo - Black Heather",new:"The Tiger Woulds"},{old:"Performance Polo - Blue & White Fans",new:"The Wind Reader"},{old:"Performance Polo - Blue Bowtie",new:"The Texas Wedge Enthusiast"},{old:"Performance Polo - Blue Houndstooth",new:"The Diplomat"},{old:"Performance Polo - Blue Stripe",new:"The Turn Father"},{old:"Performance Polo - Blue Wave",new:"The Cart Barn Celebrity"},{old:"Performance Polo - Dark Green Bowtie",new:"The Legend of Bogey Vance"},{old:"Performance Polo - Gray Bowtie",new:"The Clubhouse Fixture"},{old:"Performance Polo - Gray Stripe",new:"The Hampton Palmers"},{old:"Performance Polo - Green Bowtie",new:"The Gimmie King"},{old:"Performance Polo - Green Houndstooth",new:"The Shotgun Prince"},{old:"Performance Polo - Green Stripe",new:"The Strappy Gilmore"},{old:"Performance Polo - Green Topo",new:"The Arnold Palm Squeezer"},{old:"Performance Polo - Green Wave",new:"The 18th & Aperol"},{old:"Performance Polo - Light Blue Heather",new:"The Scottie Stresslers"},{old:"Performance Polo - Light Blue Stripe",new:"The Big Lebirdski"},{old:"Performance Polo - Light Blue Topo",new:"Talk Birdie to Me"},{old:"Performance Polo - Llama Del Mar",new:"The Barack O'Llamas"},{old:"Performance Polo - Merman Print",new:"The Merman"},{old:"Performance Polo - Navy",new:"The Lord of the Swings"},{old:"Performance Polo - Navy Heather",new:"The Phil Wagersons"},{old:"Performance Polo - Navy Houndstooth",new:"The Bogey Negotiator"},{old:"Performance Polo - Navy Topo",new:"The Tee & Tea King"},{old:"Performance Polo - Navy Wave",new:"The Turnfather"},{old:"Performance Polo - Navy/Carolina Bowtie",new:"Jabba the Putt"},{old:"Performance Polo - Oatmeal Bowtie",new:"The Jon Daily"},{old:"Performance Polo - Orange Stripe",new:"The Shankapotomus"},{old:"Performance Polo - Orange Wave",new:"The Nine & Wine Crew"},{old:"Performance Polo - Pink Bowtie",new:"The Post Round Pilsner"},{old:"Performance Polo - Purple Bowtie",new:"Mulligan's Island"},{old:"Performance Polo - Purple Stripe",new:"The Dusty Johnson"},{old:"Performance Polo - Purple Wave",new:"The Cart Cooler Captain"},{old:"Performance Polo - Red/White/Blue Bowtie",new:"The Grip & Ripmore"},{old:"Performance Polo - Teal Fans",new:"The Caddy Smacks"},{old:"Performance Polo - White",new:"The Baby Fades"}
+    ],
+    "Quarter Zip": [
+      {old:"Quarter Zip - Beige Heather",new:"The Geronimo"},{old:"Quarter Zip - Black",new:"The Nightwalk"},{old:"Quarter Zip - Cold Ash Heather",new:"The Last Drag"},{old:"Quarter Zip - Coral Heather",new:"The Rooster Cogburns"},{old:"Quarter Zip - Faded Blue",new:"The Curtain Call"},{old:"Quarter Zip - Gray",new:"The Maverick"},{old:"Quarter Zip - Light Blue Heather",new:"The Roadie"},{old:"Quarter Zip - Light Gray Heather",new:"The Alamo"},{old:"Quarter Zip - Merlot Heather",new:"The Kingmaker"},{old:"Quarter Zip - Midnight Static Heather",new:"The Last Guy Up"},{old:"Quarter Zip - Navy",new:"The Lone Ranger"},{old:"Quarter Zip - Navy Heather",new:"The Midnight Rambler"},{old:"Quarter Zip - Stonewash Heather",new:"The One More Round"},{old:"Quarter Zip - Teal Heather",new:"The Drifter"}
+    ],
+    "Lightweight Hoodies": [
+      {old:"SuperSoft Hoodie - Black",new:"The Dawn Watch"},{old:"SuperSoft Hoodie - Brown Heather",new:"The Clubhouse Coffee"},{old:"SuperSoft Hoodie - Charcoal Heather",new:"The Range Smoke"},{old:"SuperSoft Hoodie - Light Blue Heather",new:"The Daylight Review"},{old:"SuperSoft Hoodie - Light Gray Heather",new:"The Fairway Fog"},{old:"SuperSoft Hoodie - Maroon Heather",new:"The Last Call Cabernets"},{old:"SuperSoft Hoodie - Navy",new:"The Breakwater"},{old:"SuperSoft Hoodie - Oatmeal Heather",new:"The Sunrise Session"},{old:"SuperSoft Hoodie - Stonewash Heather",new:"The First Pour"}
+    ],
+    "SuperSoft Tees": [
+      {old:"Supersoft Tee - Black",new:"The Flu Game"},{old:"Supersoft Tee - Black Heather",new:"The One More Round"},{old:"Supersoft Tee - Blue Heather",new:"The Dean Dome"},{old:"Supersoft Tee - Brown Heather",new:"The Mud Bowl"},{old:"Supersoft Tee - Charcoal Heather",new:"The Fullback Dive"},{old:"Supersoft Tee - Coral Heather",new:"The Coral Comeback"},{old:"Supersoft Tee - Cranberry Heather",new:"The Hold The Line"},{old:"Supersoft Tee - Gray Heather",new:"The No Day Off"},{old:"Supersoft Tee - Light Blue Heather",new:"The Three-Peat Pending"},{old:"Supersoft Tee - Light Gray Heather",new:"The On To Cincinnati"},{old:"Supersoft Tee - Maroon Heather",new:"The Oklahoma Drill"},{old:"Supersoft Tee - Merlot Heather",new:"The Mega Pint of Wine"},{old:"Supersoft Tee - Navy",new:"The Keep It On"},{old:"Supersoft Tee - Navy Heather",new:"The Cinderella Run"},{old:"Supersoft Tee - Stonewash Heather",new:"The Never Left"},{old:"Supersoft Tee - Teal Heather",new:"Steve Balmer Windows '95"},{old:"Supersoft Tee - White",new:"The Unbenchable"}
+    ]
+  }
+};
+
+// ─── BROWSE ─────────────────────────────────────────────
+let currentCat = 'bottoms';
+let currentSub = null;
+
+function setCat(cat) {
+  currentCat = cat;
+  currentSub = null;
+  document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  renderSubTabs();
+  renderGrid();
+}
+
+function renderSubTabs() {
+  const subs = Object.keys(DATA[currentCat]);
+  const el = document.getElementById('subTabs');
+  el.innerHTML = subs.map(s =>
+    `<button class="sub-tab${currentSub===s?' active':''}" onclick="setSub('${s}')">${s}</button>`
+  ).join('');
+}
+
+function setSub(sub) {
+  currentSub = sub;
+  document.querySelectorAll('.sub-tab').forEach(t => {
+    t.classList.toggle('active', t.textContent === sub);
+  });
+  renderGrid();
+}
+
+function renderGrid() {
+  const grid = document.getElementById('productGrid');
+  const cat = DATA[currentCat];
+  const keys = currentSub ? [currentSub] : Object.keys(cat);
+  let html = '';
+  keys.forEach(key => {
+    if (!currentSub) html += `<div class="section-title">${key}</div>`;
+    cat[key].forEach(item => {
+      html += `<div class="product-row">
+        <div class="p-new">${item.new}</div>
+        <div class="p-old">${item.old !== '—' ? item.old : '<em style="color:#ddd">new style</em>'}</div>
+      </div>`;
+    });
+  });
+  grid.innerHTML = html || '<div class="empty">Nothing here yet!</div>';
+}
+
+// ─── TABS ────────────────────────────────────────────────
+function switchTab(tab) {
+  document.getElementById('aiTab').classList.toggle('hidden', tab !== 'ai');
+  document.getElementById('browseTab').classList.toggle('hidden', tab !== 'browse');
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', (i===0&&tab==='ai')||(i===1&&tab==='browse')));
+  if (tab === 'browse') { renderSubTabs(); renderGrid(); }
+}
+
+// ─── AI CHAT ─────────────────────────────────────────────
 let hist = [];
 function addMsg(html, cls) {
   const d = document.createElement('div');
