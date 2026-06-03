@@ -4,10 +4,10 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) return res.status(500).json({ error: 'API key not configured' });
-
+ 
+  const apiKey = 'sk-ant-api03--aOk_1iSLrY4MwqDB4AMTvArrwo0_yz1rgGhIFbWS8nwDG864qtybuhcC-nT044E3VsGxxnzgCNKu2wERE1m0Q-_cQEzwAA';
+  
+ 
   try {
     const { messages } = req.body;
     const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -21,7 +21,7 @@ export default async function handler(req, res) {
         model: 'claude-haiku-4-5-20251001',
         max_tokens: 800,
         system: `You are a friendly birddogs customer service assistant helping people find product names. birddogs recently renamed ALL their products from plain color names to fun unique names.
-
+ 
 KEY RULES:
 - "What are black pants called now?" = give the NEW fun name
 - "What are SuperSoft Tees called now?" = list ALL SuperSoft Tee new names
@@ -31,7 +31,7 @@ KEY RULES:
 - Always be helpful, never say you cannot find something
 - Keep responses short and scannable with line breaks
 - Be warm and fun!
-
+ 
 FULL NAME CHEAT SHEET:
 3-in-1 Khaki Shorts: Baby Blue=The Chapel Thrills, Black=The Nightcaps, Cranberry=The Redlines, Dark Gray=The Free Plays, Dark Green=The Frank the Tanks, Kashmir Green=The Green Room, Lavender=The Lavender Lords, Light Gray=The Second Winds, Lobster Red=The Coral Horizons, Maroon=The Burgundy Hours, Navy=The Sidequest, Nile Blue=The Splashton Kutchers, Original Khaki=The Sunrise Crew, Peach=Lifes A Peach, Stone=The Irish Exits, Storm Blue=The Andy Duffrains, White=The Old Sports, Beach Glass=The Island Apertifs, Bermuda Blue=The Ray Finkles, Graham=The Marty McFridays, Purple Rose=The Grape Gatsby, Riverside=The Burton Boys, Sunlight Yellow=The Punch-a-Chus, Surfspray=The Seafoam Seekers.
 ElasTech Gym Shorts: Black=The Knightriders, Black Heather=The Shortal Kombats, Gray=The Gray Area 51s, Gray Heather=The Kung Pow-ers, Navy=The BraveShorts, Navy Heather=The Tae Kwon-Donts.
